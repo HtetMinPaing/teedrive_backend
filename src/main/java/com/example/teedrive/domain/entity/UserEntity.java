@@ -26,10 +26,10 @@ public class UserEntity {
 
     private String avatar;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private Set<FileEntity> ownedFiles;
-
-    @ManyToMany(mappedBy = "sharedWith")
-    private Set<FileEntity> sharedFiles;
+//    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    private Set<FileEntity> ownedFiles;
+//
+//    @ManyToMany(mappedBy = "sharedWith", fetch = FetchType.EAGER)
+//    private Set<FileEntity> sharedFiles;
 
 }
