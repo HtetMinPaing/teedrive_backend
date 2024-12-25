@@ -30,9 +30,7 @@ public class FileEntity {
 
     private String size;
 
-    private String users;
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "author_id")
     private UserEntity owner;
 
