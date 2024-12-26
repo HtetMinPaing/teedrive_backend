@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,15 +22,19 @@ public class FileController {
 
     private FileService fileService;
 
-    private UserService userService;
-
     private Mapper<FileEntity, FileDto> fileMapper;
 
 
-    public FileController(FileService fileService, UserService userService, Mapper<FileEntity, FileDto> fileMapper) {
+    public FileController(FileService fileService, Mapper<FileEntity, FileDto> fileMapper) {
         this.fileService = fileService;
-        this.userService = userService;
         this.fileMapper = fileMapper;
+    }
+
+    @GetMapping(path = "/files")
+    public  List<FileEntity> getAllFiles() {
+        List<FileEntity> allFiles = fileService.findAll();
+        System.out.println(allFiles);
+        return allFiles;
     }
 
     @PostMapping(path = "/files")
@@ -40,15 +45,8 @@ public class FileController {
         return new ResponseEntity<>(returnFileDto, HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/files")
-    public  List<FileEntity> getAllFilesByUser() {
-        List<FileEntity> allFiles = fileService.findAll();
-        System.out.println(allFiles);
-        return allFiles;
-    }
-
-    @GetMapping(path = "/files/user/{id}")
-    public List<FileDto> getOwnAndSharedFiles(@PathVariable("id") Long id) {
+    @GetMapping(path = "/{userId}/files")
+    public List<FileDto> getOwnAndSharedFiles(@PathVariable("userId") Long id) {
         List<FileEntity> allFiles = fileService.findbyUserId(id);
         return allFiles.stream()
                 .map(fileMapper::mapTo)
@@ -64,15 +62,10 @@ public class FileController {
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PatchMapping(path = "/files/{id}")
-    public ResponseEntity<FileDto> partialUpdate(
-            @PathVariable("id") Long id,
-            @RequestBody FileDto fileDto
-    ) {
-        FileEntity fileEntity = fileMapper.mapFrom(fileDto);
-        FileEntity updatedFileEntity = fileService.partialUpdate(id, fileEntity);
-        FileDto returnFileDto = fileMapper.mapTo(updatedFileEntity);
-        return new ResponseEntity<>(returnFileDto, HttpStatus.OK);
+    @DeleteMapping(path = "/files/{id}")
+    public ResponseEntity<FileDto> deleteFile(@PathVariable("id") Long id) {
+        fileService.deleteFile(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping(path = "/files/{id}/rename")
@@ -96,11 +89,11 @@ public class FileController {
         return new ResponseEntity<>(returnFileDto, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/files/{id}")
-    public ResponseEntity<FileDto> deleteFile(@PathVariable("id") Long id) {
-        fileService.deleteFile(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @GetMapping(path = "{userId}/space")
+    public ResponseEntity<Map<String, Object>> calculateTotalSpaceUsed(
+            @PathVariable("userId") Long userId
+    ) {
+        Map<String, Object> totalSpaceDetails = fileService.calculateTotalSpaceUsed(userId);
+        return new ResponseEntity<>(totalSpaceDetails, HttpStatus.OK);
     }
-
-
 }

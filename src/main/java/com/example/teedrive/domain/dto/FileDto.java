@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -24,7 +25,11 @@ public class FileDto {
 
     private String extension;
 
-    private String size;
+    private Long size;
+
+    private Date createdAt;
+
+    private Date updatedAt;
 
     private UserEntity owner;
 

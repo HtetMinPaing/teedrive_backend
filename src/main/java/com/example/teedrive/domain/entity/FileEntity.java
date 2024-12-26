@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -28,7 +29,11 @@ public class FileEntity {
 
     private String extension;
 
-    private String size;
+    private Long size;
+
+    private Date createdAt;
+
+    private Date updatedAt;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "author_id")
@@ -42,4 +47,14 @@ public class FileEntity {
     )
     private Set<UserEntity> sharedWith;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+        updatedAt = createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
 }

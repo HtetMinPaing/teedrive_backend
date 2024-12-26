@@ -17,12 +17,12 @@ import java.util.Set;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
-    private Long id;
+    private String email;
 
     private String fullName;
 
-    private String email;
+    @Column(nullable = false)
+    private String password;
 
     private String avatar;
 

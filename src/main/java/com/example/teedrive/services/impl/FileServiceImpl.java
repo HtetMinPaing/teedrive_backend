@@ -7,9 +7,7 @@ import com.example.teedrive.repositories.UserRepository;
 import com.example.teedrive.services.FileService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -54,19 +52,6 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileEntity partialUpdate(Long id, FileEntity fileEntity) {
-        fileEntity.setId(id);
-        return fileRepository.findById(id).map(existingFile -> {
-            Optional.ofNullable(fileEntity.getName()).ifPresent(existingFile::setName);
-            Optional.ofNullable(fileEntity.getSize()).ifPresent(existingFile::setSize);
-            Optional.ofNullable(fileEntity.getExtension()).ifPresent(existingFile::setExtension);
-            Optional.ofNullable(fileEntity.getType()).ifPresent(existingFile::setType);
-            Optional.ofNullable(fileEntity.getUrl()).ifPresent(existingFile::setUrl);
-            return  fileRepository.save(existingFile);
-        }).orElseThrow(() -> new RuntimeException("Cannot update File"));
-    }
-
-    @Override
     public Optional<FileEntity> findOne(Long id) {
         return fileRepository.findById(id);
     }
@@ -94,5 +79,32 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteFile(Long id) {
         fileRepository.deleteById(id);
+    }
+
+    public Map<String, Object> calculateTotalSpaceUsed(Long userId) {
+        List<Object[]> spaceUsedData = fileRepository.calculateSpaceUsedByType(userId);
+        Long totalUsedSpace = fileRepository.calculateTotalSpaceUsed(userId);
+        Long totalSpaceAvailable = 2L * 1024 * 1024 * 1024; // 2GB
+
+        Map<String, Object> totalSpace = new HashMap<>();
+        Map<String, Object> fileTypeData = new HashMap<>();
+
+        spaceUsedData.forEach(record -> {
+            String type = (String) record[0];
+            Long size = (Long) record[1];
+            Date latestDate = (Date) record[2];
+
+            Map<String, Object> typeDetails = new HashMap<>();
+            typeDetails.put("size", size);
+            typeDetails.put("latestDate", latestDate != null ? latestDate.toString() : "");
+
+            fileTypeData.put(type, typeDetails);
+        });
+
+        totalSpace.put("fileTypes", fileTypeData);
+        totalSpace.put("used", totalUsedSpace != null ? totalUsedSpace : 0);
+        totalSpace.put("available", totalSpaceAvailable);
+
+        return totalSpace;
     }
 }
