@@ -25,14 +25,14 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileEntity uploadFile(FileEntity fileEntity) {
-        UserEntity owner = userRepository.findByEmail(fileEntity.getOwner().getEmail())
-                .orElseThrow(() -> new RuntimeException("No User found"));
+        UserEntity owner = userRepository.findById(fileEntity.getOwner().getId())
+                .orElseThrow(() -> new RuntimeException("No Sign In User. Please Sign In"));
         fileEntity.setOwner(owner);
 
         Set<UserEntity> sharedUsers = fileEntity.getSharedWith().stream()
                 .map(user -> {
                     return userRepository.findByEmail(user.getEmail())
-                            .orElseThrow(() -> new RuntimeException("No User found"));
+                            .orElseThrow(() -> new RuntimeException("User does not exist: " + user.getEmail()));
                 }).collect(Collectors.toSet());
         fileEntity.setSharedWith(sharedUsers);
         return fileRepository.save(fileEntity);
@@ -65,10 +65,15 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileEntity updateSharedUser(Long id, Set<Long> sharedUsersId) {
-        Set<UserEntity> sharedUsers = sharedUsersId.stream()
-                .map(userId -> userRepository.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("User not found")))
+    public FileEntity updateSharedUser(Long id, Set<String> sharedUserEmails) {
+        Set<UserEntity> sharedUsers = sharedUserEmails.stream()
+                .map(email -> {
+                    return userRepository
+                            .findByEmail(email)
+                            .orElseThrow(() ->
+                                    new RuntimeException("User does not exist: " + email)
+                            );
+                })
                 .collect(Collectors.toSet());
         return fileRepository.findById(id).map(existingFile -> {
             existingFile.setSharedWith(sharedUsers);

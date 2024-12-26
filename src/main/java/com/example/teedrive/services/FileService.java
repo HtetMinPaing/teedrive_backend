@@ -20,9 +20,9 @@ public interface FileService {
 
     FileEntity renameFIle(Long id, String name);
 
-    FileEntity updateSharedUser(Long id, Set<Long> sharedUsers);
+    FileEntity updateSharedUser(Long id, Set<String> sharedUserEmails);
 
     void deleteFile(Long id);
 
-    public Map<String, Object> calculateTotalSpaceUsed(Long userId);
+    Map<String, Object> calculateTotalSpaceUsed(Long userId);
 }

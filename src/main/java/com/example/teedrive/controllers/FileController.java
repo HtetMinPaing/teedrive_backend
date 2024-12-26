@@ -38,11 +38,15 @@ public class FileController {
     }
 
     @PostMapping(path = "/files")
-    public ResponseEntity<FileDto> uploadFile(@RequestBody FileDto fileDto) {
-        FileEntity fileEntity = fileMapper.mapFrom(fileDto);
-        FileEntity savedFileEntity = fileService.uploadFile(fileEntity);
-        FileDto returnFileDto = fileMapper.mapTo(savedFileEntity);
-        return new ResponseEntity<>(returnFileDto, HttpStatus.CREATED);
+    public ResponseEntity<?> uploadFile(@RequestBody FileDto fileDto) {
+        try {
+            FileEntity fileEntity = fileMapper.mapFrom(fileDto);
+            FileEntity savedFileEntity = fileService.uploadFile(fileEntity);
+            FileDto returnFileDto = fileMapper.mapTo(savedFileEntity);
+            return new ResponseEntity<>(returnFileDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping(path = "/{userId}/files")
@@ -69,24 +73,32 @@ public class FileController {
     }
 
     @PatchMapping(path = "/files/{id}/rename")
-    public ResponseEntity<FileDto> renameFile(
+    public ResponseEntity<?> renameFile(
             @PathVariable("id") Long id,
             @RequestBody FileDto fileDto
     ) {
-        FileEntity fileEntity = fileMapper.mapFrom(fileDto);
-        FileEntity updatedFileEntity = fileService.renameFIle(id, fileDto.getName());
-        FileDto returnFileDto = fileMapper.mapTo(updatedFileEntity);
-        return new ResponseEntity<>(returnFileDto, HttpStatus.OK);
+        try {
+            FileEntity fileEntity = fileMapper.mapFrom(fileDto);
+            FileEntity updatedFileEntity = fileService.renameFIle(id, fileDto.getName());
+            FileDto returnFileDto = fileMapper.mapTo(updatedFileEntity);
+            return new ResponseEntity<>(returnFileDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PatchMapping(path = "/files/{id}/sharedWith")
-    public ResponseEntity<FileDto> updateSharedUsers(
+    public ResponseEntity<?> updateSharedUsers(
             @PathVariable("id") Long id,
-            @RequestBody Set<Long> sharedUsersId
+            @RequestBody Set<String> sharedUserEmails
     ) {
-        FileEntity updatedFileEntity = fileService.updateSharedUser(id, sharedUsersId);
-        FileDto returnFileDto = fileMapper.mapTo(updatedFileEntity);
-        return new ResponseEntity<>(returnFileDto, HttpStatus.OK);
+        try {
+            FileEntity updatedFileEntity = fileService.updateSharedUser(id, sharedUserEmails);
+            FileDto returnFileDto = fileMapper.mapTo(updatedFileEntity);
+            return new ResponseEntity<>(returnFileDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping(path = "{userId}/space")
