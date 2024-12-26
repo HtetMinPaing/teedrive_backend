@@ -24,20 +24,35 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @PostMapping(path = "/users")
-    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto) {
-        UserEntity userEntity = userMapper.mapFrom(userDto);
-        UserEntity savedUserEntity = userService.saveUser(userEntity);
-        UserDto returnUserDto = userMapper.mapTo(savedUserEntity);
-        return new ResponseEntity<>(returnUserDto, HttpStatus.CREATED);
-    }
-
     @GetMapping(path = "/users")
     public List<UserDto> getAllUsers() {
         List<UserEntity> allUsers = userService.findAllUsers();
         return allUsers.stream()
                 .map(userMapper::mapTo)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping(path = "/users/signin")
+    public ResponseEntity<?> signInNewUser(@RequestBody UserDto userDto) {
+        try {
+            UserEntity userEntity = userMapper.mapFrom(userDto);
+            UserEntity savedUserEntity = userService.signInNewUser(userEntity);
+            UserDto returnUserDto = userMapper.mapTo(savedUserEntity);
+            return new ResponseEntity<>(returnUserDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping(path = "/users/signup")
+    public ResponseEntity<?> signUpUser(@RequestBody UserDto userDto) {
+        try {
+            UserEntity userEntity = userService.signUpUser(userDto.getEmail(), userDto.getPassword());
+            UserDto returnUserDto = userMapper.mapTo(userEntity);
+            return new ResponseEntity<>(returnUserDto, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping(path = "/users/{id}")

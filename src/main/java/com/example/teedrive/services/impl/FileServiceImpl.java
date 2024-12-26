@@ -25,13 +25,13 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileEntity uploadFile(FileEntity fileEntity) {
-        UserEntity owner = userRepository.findById(fileEntity.getOwner().getId())
+        UserEntity owner = userRepository.findByEmail(fileEntity.getOwner().getEmail())
                 .orElseThrow(() -> new RuntimeException("No User found"));
         fileEntity.setOwner(owner);
 
         Set<UserEntity> sharedUsers = fileEntity.getSharedWith().stream()
                 .map(user -> {
-                    return userRepository.findById(user.getId())
+                    return userRepository.findByEmail(user.getEmail())
                             .orElseThrow(() -> new RuntimeException("No User found"));
                 }).collect(Collectors.toSet());
         fileEntity.setSharedWith(sharedUsers);

@@ -20,8 +20,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity saveUser(UserEntity userEntity) {
+    public UserEntity signInNewUser(UserEntity userEntity) {
+//        String hashedPassword = passwordEncoder.encode(userEntity.getPassword());
+//        userEntity.setPassword(hashedPassword);
+        if(userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
+            throw new RuntimeException("Email Already taken");
+        }
         return userRepository.save(userEntity);
+    }
+
+    @Override
+    public UserEntity signUpUser(String email, String password) {
+        UserEntity foundUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("No user found with this email"));
+        if (password.equals(foundUser.getPassword())) {
+            return foundUser;
+        } else {
+            throw new RuntimeException(("Password Incorrect"));
+        }
+    }
+
+    @Override
+    public Optional<UserEntity> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -37,4 +58,13 @@ public class UserServiceImpl implements UserService {
         ).collect(Collectors.toList());
     }
 
+    @Override
+    public UserEntity updateUser(Long id, UserEntity userEntity) {
+        return null;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
 }

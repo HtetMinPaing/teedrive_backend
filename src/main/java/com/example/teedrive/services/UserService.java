@@ -6,9 +6,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    UserEntity saveUser(UserEntity userEntity);
+    UserEntity signInNewUser(UserEntity userEntity);
+
+    UserEntity signUpUser(String email, String password);
+
+    Optional<UserEntity> findUserByEmail(String email);
 
     Optional<UserEntity> findUserById(Long id);
 
     List<UserEntity> findAllUsers();
+
+    UserEntity updateUser(Long id, UserEntity userEntity);
+
+    void deleteUser(Long id);
 }
