@@ -1,11 +1,13 @@
 package com.example.teedrive.controllers;
 
 import com.example.teedrive.domain.dto.RegisterDto;
+import com.example.teedrive.domain.dto.TokenDto;
 import com.example.teedrive.domain.dto.UserDto;
 import com.example.teedrive.domain.entity.RoleEntity;
 import com.example.teedrive.domain.entity.UserEntity;
 import com.example.teedrive.repositories.RoleRepository;
 import com.example.teedrive.repositories.UserRepository;
+import com.example.teedrive.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,29 +29,33 @@ public class AuthController {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private JWTGenerator jwtGenerator;
 
     @Autowired
     public AuthController(
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JWTGenerator jwtGenerator
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtGenerator = jwtGenerator;
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<String> login(@RequestBody UserDto userDto) {
+    public ResponseEntity<TokenDto> login(@RequestBody UserDto userDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         userDto.getEmail(),
                         userDto.getPassword()
                 ));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User sign in successfully", HttpStatus.OK);
+        String token = jwtGenerator.generateToken(authentication);
+        return new ResponseEntity<>(new TokenDto(token), HttpStatus.OK);
     }
 
     @PostMapping(path = "/register")
