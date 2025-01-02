@@ -34,4 +34,6 @@ public class FileDto {
     private UserEntity owner;
 
     private Set<UserEntity> sharedWith;
+
+    private String bucketFileId;
 }

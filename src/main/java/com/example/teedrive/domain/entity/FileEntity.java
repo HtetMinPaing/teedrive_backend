@@ -47,6 +47,8 @@ public class FileEntity {
     )
     private Set<UserEntity> sharedWith;
 
+    private String bucketFileId;
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

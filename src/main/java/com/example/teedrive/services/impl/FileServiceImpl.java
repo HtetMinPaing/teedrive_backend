@@ -5,6 +5,7 @@ import com.example.teedrive.domain.entity.UserEntity;
 import com.example.teedrive.repositories.FileRepository;
 import com.example.teedrive.repositories.UserRepository;
 import com.example.teedrive.services.FileService;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -86,10 +87,13 @@ public class FileServiceImpl implements FileService {
         fileRepository.deleteById(id);
     }
 
+    @Override
     public Map<String, Object> calculateTotalSpaceUsed(Long userId) {
         List<Object[]> spaceUsedData = fileRepository.calculateSpaceUsedByType(userId);
         Long totalUsedSpace = fileRepository.calculateTotalSpaceUsed(userId);
         Long totalSpaceAvailable = 2L * 1024 * 1024 * 1024; // 2GB
+
+        List<String> predefinedFileTypes = Arrays.asList("image", "video", "document", "audio", "other");
 
         Map<String, Object> totalSpace = new HashMap<>();
         Map<String, Object> fileTypeData = new HashMap<>();
@@ -105,6 +109,11 @@ public class FileServiceImpl implements FileService {
 
             fileTypeData.put(type, typeDetails);
         });
+
+        for (String fileType : predefinedFileTypes) {
+            fileTypeData.putIfAbsent(fileType, Map.of("size", 0L, "latestDate", ""));
+        }
+
 
         totalSpace.put("fileTypes", fileTypeData);
         totalSpace.put("used", totalUsedSpace != null ? totalUsedSpace : 0);

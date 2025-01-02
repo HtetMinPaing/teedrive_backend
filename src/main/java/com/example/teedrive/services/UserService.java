@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    UserEntity signInNewUser(UserEntity userEntity);
+    UserEntity signUpNewUser(UserEntity userEntity);
 
-    UserEntity signUpUser(String email, String password);
+    UserEntity signInUser(String email, String password);
 
     Optional<UserEntity> findUserByEmail(String email);
 

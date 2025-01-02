@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity signInNewUser(UserEntity userEntity) {
+    public UserEntity signUpNewUser(UserEntity userEntity) {
 //        String hashedPassword = passwordEncoder.encode(userEntity.getPassword());
 //        userEntity.setPassword(hashedPassword);
         if(userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity signUpUser(String email, String password) {
+    public UserEntity signInUser(String email, String password) {
         UserEntity foundUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("No user found with this email"));
         if (password.equals(foundUser.getPassword())) {

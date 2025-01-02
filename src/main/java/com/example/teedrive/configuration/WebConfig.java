@@ -10,7 +10,8 @@
 //    public void addCorsMappings(CorsRegistry registry) {
 //        registry.addMapping("/**")
 //                .allowedOrigins("http://localhost:3000") // Replace with your React frontend URL
-//                .allowedMethods("GET", "POST", "PUT", "DELETE");
+//                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+//                .allowCredentials(true);
 //    }
 //}
 //
